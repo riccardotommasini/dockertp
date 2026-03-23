@@ -21,24 +21,26 @@ public class Main {
         Class.forName("org.postgresql.Driver");
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-        server.createContext("/noun", handler("nouns"));
+        server.createContext("/noun", handler("nouns", "ASC"));
+        server.createContext("/noun-bottom", handler("nouns", "DESC"));
         server.createContext("/verb", handler("verbs"));
-        server.createContext("/adjective", handler("adjectives"));
+        server.createContext("/adjective", handler("adjectives", "ASC"));
+        server.createContext("/adjective-bottom", handler("adjectives", "DESC"));
         server.start();
         System.out.println("Server started.");
     }
 
-    private static String randomWord(String table, long minuteSeed) {
+    private static String randomWord(String table, String order, long minuteSeed) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             try (Statement statement = connection.createStatement()) {
-                try (ResultSet set = statement.executeQuery("SELECT word FROM " + table + " ORDER BY word")) {
+                try (ResultSet set = statement.executeQuery("SELECT word FROM " + table + " ORDER BY word " + order)) {
                     List<String> words = new ArrayList<>();
                     while (set.next()) {
                         words.add(set.getString(1));
                     }
 
                     if (!words.isEmpty()) {
-                        long tableSeed = minuteSeed ^ table.hashCode();
+                        long tableSeed = minuteSeed ^ table.hashCode() ^ order.hashCode();
                         Random random = new Random(tableSeed);
                         return words.get(random.nextInt(words.size()));
                     }
@@ -52,9 +54,13 @@ public class Main {
     }
 
     private static HttpHandler handler(String table) {
+        return handler(table, "ASC");
+    }
+
+    private static HttpHandler handler(String table, String order) {
         return t -> {
             long minuteSeed = Instant.now().getEpochSecond() / SEED_WINDOW_SECONDS;
-            String response = "{\"word\":\"" + randomWord(table, minuteSeed) + "\"}";
+            String response = "{\"word\":\"" + randomWord(table, order, minuteSeed) + "\"}";
             byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
 
             System.out.println(response);

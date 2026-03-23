@@ -86,6 +86,13 @@ body {
   color: var(--muted);
 }
 
+.hero__actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .hero__button {
   border: 0;
   border-radius: 999px;
@@ -103,6 +110,12 @@ body {
 .hero__button:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 28px 58px rgba(0, 7, 27, 0.4);
+}
+
+.hero__button--secondary {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .board {
@@ -203,6 +216,70 @@ body {
   width: 100%;
   opacity: 0.4;
   pointer-events: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.story-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+.story-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 10, 31, 0.74);
+  backdrop-filter: blur(8px);
+}
+
+.story-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 640px);
+  margin: 10vh auto 0;
+  padding: 28px 24px 24px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(4, 24, 70, 0.96), rgba(8, 41, 98, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 30px 80px rgba(0, 6, 20, 0.45);
+}
+
+.story-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.story-modal__eyebrow {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.story-modal__title {
+  margin: 0 0 14px;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.story-modal__body {
+  margin: 0;
+  line-height: 1.7;
+  font-size: 1.02rem;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: pre-wrap;
 }
 
 @keyframes rise-in {

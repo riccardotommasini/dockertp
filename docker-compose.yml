@@ -1,21 +1,37 @@
 services:
   db:
     build: ./db
+    ports:
+      - "5432:5432"
   words:
     build: ./words
     depends_on:
       - db
     ports:
       - "8080:8080"
-  web:
-    build: ./web
-    depends_on:
-      - words
-    ports:
-      - "80:80"
+  # web:
+  #   build: ./web
+  #   depends_on:
+  #     - words
+  #   ports:
+  #     - "80:80"
   web2:
     build: ./web2
     depends_on:
       - words
+    volumes:
+      - ./web2/public:/app/public
     ports:
       - "8000:8000"
+  narrative:
+    build: ./narrative
+    depends_on:
+      - words
+    models:
+      - llm
+    ports:
+      - "8181:8181"
+
+models:
+  llm:
+    model: ai/llama3.2
