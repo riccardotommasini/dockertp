@@ -5,8 +5,8 @@ const http = require("node:http");
 
 const publicDir = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 8000);
-const host = process.env.HOST || "127.0.0.1";
-const wordsHost = "words";
+const host = process.env.HOST || "0.0.0.0";
+const wordsHost = process.env.WORDS_HOST || "words";
 const wordsPort = Number(process.env.WORDS_PORT || 8080);
 const narrativeHost = process.env.NARRATIVE_HOST || "narrative";
 const narrativePort = Number(process.env.NARRATIVE_PORT || 8181);
