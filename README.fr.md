@@ -39,7 +39,7 @@ doivent afficher un court message indiquant qu’ils tournent), mais nous ne
 cherchons pas encore à lancer l’application complète ni à connecter les services.
 Cela viendra plus tard.
 
-### web
+### web (legacy UI)
 
 C’est un serveur web écrit en Go. Pour compiler du Go, on peut utiliser
 l’image officielle `golang`, ou bien installer les paquets Go dans
@@ -236,6 +236,20 @@ Ou le précharger en arrière-plan :
 ```bash
 docker model run --detach ai/smollm2
 ```
+
+### Connectez les conteneurs
+
+Créer un réseau
+```docker network create inclass```
+
+Connectez les conteneurs un par un, par exemple la base de données
+
+```docker network connect inclass db```
+
+Les conteneurs DOIVENT avoir les noms suivants pour se connecter de manière transparente, utilisez --name <nom>
+- db
+- words
+- narrative
 
 ## Exercice 2 : Compose
 
