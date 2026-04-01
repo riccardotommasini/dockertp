@@ -28,7 +28,9 @@ services:
     depends_on:
       - words
     models:
-      - llm
+      llm:
+        endpoint_var: LLM_BASE_URL
+        model_var: LLM_MODEL_NAME
     ports:
       - "8181:8181"
 
