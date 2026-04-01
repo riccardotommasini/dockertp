@@ -49,7 +49,11 @@ class NarrativeHandler(BaseHTTPRequestHandler):
             })
         except Exception as error:
             print(f"[narrative] error: {error}")
-            self.send_json(500, {"error": str(error)})
+            self.send_json(500, {
+                "error": str(error),
+                "model": LLM_MODEL_NAME,
+                "llm_base_url": LLM_BASE_URL,
+            })
 
     def send_json(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
@@ -106,18 +110,27 @@ def generate_story(components):
     )
 
     try:
-        print(f"[narrative] calling model {LLM_MODEL_NAME} at {LLM_BASE_URL}")
+        print(f"[narrative] calling model {LLM_MODEL_NAME} at {LLM_BASE_URL}/chat/completions")
+        print(f"[narrative] prompt preview: {prompt[:160]}")
         with urlopen(request) as response:
             completion = json.loads(response.read().decode("utf-8"))
             print(f"[narrative] model response keys: {list(completion.keys())}")
     except HTTPError as error:
-        raise RuntimeError(error.read().decode("utf-8")) from error
+        error_body = error.read().decode("utf-8", errors="replace")
+        print(f"[narrative] model HTTP error status={error.code} reason={error.reason}")
+        print(f"[narrative] model HTTP error body: {error_body[:1000]}")
+        raise RuntimeError(f"Model server returned HTTP {error.code}: {error.reason}") from error
     except URLError as error:
+        print(f"[narrative] model network error: {error}")
         raise RuntimeError(f"Failed to reach model server: {error}") from error
+    except Exception as error:
+        print(f"[narrative] unexpected model call error: {error}")
+        raise
 
     try:
         return completion["choices"][0]["message"]["content"].strip()
     except (KeyError, IndexError, TypeError) as error:
+        print(f"[narrative] unexpected model response payload: {json.dumps(completion)[:1000]}")
         raise RuntimeError(f"Unexpected model response: {completion}") from error
 
 
@@ -154,6 +167,10 @@ def ensure_stories_table(connection):
 
 
 if __name__ == "__main__":
+    print(f"[narrative] words base URL: {WORDS_BASE_URL}")
+    print(f"[narrative] model base URL: {LLM_BASE_URL}")
+    print(f"[narrative] model name: {LLM_MODEL_NAME}")
+    print(f"[narrative] database host: {DB_HOST}:{DB_PORT}/{DB_NAME}")
     server = ThreadingHTTPServer((HOST, PORT), NarrativeHandler)
     print(f"narrative listening on http://{HOST}:{PORT}")
     server.serve_forever()
